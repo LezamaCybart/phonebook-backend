@@ -2,6 +2,8 @@ const { request, response } = require("express");
 const express = require("express");
 const app = express();
 
+app.use(express.json())
+
 let persons = [
     {
         "id": 1,
@@ -43,6 +45,45 @@ app.get("/api/persons/:id", (request, response) => {
     } else {
         response.status(400).end()
     }
+})
+
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    persons = persons.filter(person => person.id !== id)
+
+    response.status(204).end()
+})
+
+const generateId = () => Math.floor(Math.random() * 100)
+
+const nameAlreadyExists = (name) => {
+    const names = persons.map(person => person.name)
+    return names.includes(name)
+}
+
+app.post('/api/persons/', (request, response) => {
+    const body = request.body
+    console.log(body)
+
+    if (!body.name || !body.number) {
+        return response.status(400).json({
+            error: 'content missing'
+        })
+    } else if(nameAlreadyExists(body.name)) {
+        return response.status(400).json({
+            error: 'name must be unique'
+        })
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: generateId()
+    }
+
+    persons = persons.concat(person)
+
+    response.json(person)
 })
 
 const PORT = 3001;
