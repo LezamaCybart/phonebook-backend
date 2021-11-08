@@ -1,8 +1,11 @@
 const { request, response } = require("express");
 const express = require("express");
 const app = express();
+const morgan = require('morgan')
 
 app.use(express.json())
+morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 let persons = [
     {
@@ -40,7 +43,7 @@ app.get("/api/persons/:id", (request, response) => {
     const id = Number(request.params.id)
     const person = persons.find(person => person.id === id)
 
-    if (person) { 
+    if (person) {
         response.json(person)
     } else {
         response.status(400).end()
@@ -69,7 +72,7 @@ app.post('/api/persons/', (request, response) => {
         return response.status(400).json({
             error: 'content missing'
         })
-    } else if(nameAlreadyExists(body.name)) {
+    } else if (nameAlreadyExists(body.name)) {
         return response.status(400).json({
             error: 'name must be unique'
         })
