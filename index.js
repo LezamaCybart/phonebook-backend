@@ -4,7 +4,8 @@ const express = require("express");
 const app = express();
 const morgan = require('morgan')
 const cors = require('cors')
-const Person = require('./models/person')
+const Person = require('./models/person');
+const person = require('./models/person');
 
 app.use(express.static('build'))
 app.use(cors())
@@ -60,12 +61,31 @@ app.delete('/api/persons/:id', (request, response) => {
         .catch(error => next(error))
 })
 
-const generateId = () => Math.floor(Math.random() * 100)
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
 
+    const person = {
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+        .then(updatedPerson => {
+            response.json(updatedPerson)
+        })
+        .catch(error => next(error))
+})
+
+/* 
+const generateId = () => Math.floor(Math.random() * 100)
 const nameAlreadyExists = (name) => {
+    Person.find({}).then(persons => {
+        const names = persons.map(person => person.name)
+        return names.include(name)
+    })
     const names = persons.map(person => person.name)
     return names.includes(name)
 }
+*/
 
 app.post('/api/persons/', (request, response) => {
     const body = request.body
@@ -73,7 +93,7 @@ app.post('/api/persons/', (request, response) => {
 
     if (body == undefined) {
         return response.status(400).json({
-            error: 'content     missing'
+            error: 'content missing'
         })
     }
 
@@ -86,6 +106,7 @@ app.post('/api/persons/', (request, response) => {
         response.json(savedPerson)
     })
 })
+
 
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
