@@ -1,19 +1,20 @@
+/* eslint-disable no-trailing-spaces */
 const mongoose = require('mongoose')
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
+  name: String,
+  number: String,
 })
 
 const Person = mongoose.model('Person', personSchema)
 
-if (process.argv.length == 3) {
-    Person.find({}).then(result => {
-        result.forEach(person => {
-            console.log(person)
-        })
-        mongoose.connection.close()
+if (process.argv.length === 3) {
+  Person.find({}).then(result => {
+    result.forEach(person => {
+      console.log(person)
     })
+    mongoose.connection.close()
+  })
 }
 
 const password = process.argv[2]
@@ -28,12 +29,11 @@ mongoose.connect(url)
 
 
 const person = new Person({
-    name: name,
-    number: number
+  name: name,
+  number: number
 })
 
-person.save().then(result => {
-    console.log(`added ${person.name} number ${person.number} to phonebook`)
-    mongoose.connection.close()
+person.save().then(() => {
+  console.log(`added ${person.name} number ${person.number} to phonebook`)
+  mongoose.connection.close()
 })
-
